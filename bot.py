@@ -13,7 +13,7 @@ ConversationHandler,
 ContextTypes,
 filters
 )
-
+TOKEN = os.getenv("BOT_TOKEN")
 CHANNEL_ID = -1003518003389
 ADMIN_ID = 8509876738  # PUT YOUR TELEGRAM ID
 
