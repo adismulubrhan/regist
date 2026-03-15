@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 import os
 import logging
 from datetime import datetime
@@ -13,24 +11,25 @@ ConversationHandler,
 ContextTypes,
 filters
 )
+
 TOKEN = os.getenv("BOT_TOKEN")
+
 CHANNEL_ID = -1003518003389
-ADMIN_ID = 8509876738  # PUT YOUR TELEGRAM ID
+ADMIN_ID = 123456789  # replace with your Telegram ID
 
 LANG, NAME, PHONE, COURSE, CLASS, TIME, LOCATION = range(7)
 
 logging.basicConfig(level=logging.INFO)
 
-registered_users = set()
+registered_users=set()
 
-language_map = {
+language_map={
 "English":"en",
 "አማርኛ":"am",
 "Afaan Oromoo":"om"
 }
 
-courses = {
-
+courses={
 "en":[
 ["Mobile Maintenance"],
 ["Advanced Mobile Software"],
@@ -39,7 +38,6 @@ courses = {
 ["Basic Computer"],
 ["TV,Decoder & Geepas Maintenance"]
 ],
-
 "am":[
 ["ሞባይል ጥገና"],
 ["አድቫንስድ የሞባይል ሶፍትዌር"],
@@ -48,40 +46,37 @@ courses = {
 ["መሰረታዊ ኮምፒውተር"],
 ["የቲቪ፣ዲኮደር እና ጂፓስ ጥገና"]
 ],
-
 "om":[
-["Suphaa Mobaayilaa"],
+["Suphaa Mobile"],
 ["Mobile Software Olaanaa"],
 ["Mobile Hardware Olaanaa"],
 ["Suphaa Laptop & Computer"],
-["Computer skill Bu'uuraa"],
-["Suphaa TV Decoder & Geepas"]
+["Computer Bu'uuraa"],
+["Suphaa TV Decoder fi Geepas"]
 ]
-
 }
 
-class_types = [
+class_types=[
 ["Regular"],
 ["Weekend"],
 ["Online"]
 ]
 
-times = [
+times=[
 ["Morning"],
 ["Afternoon"]
 ]
 
-locations = [
+locations=[
 ["Goba"],
 ["Robe"]
 ]
 
 def is_admin(user_id):
-    return user_id == ADMIN_ID
+    return user_id==ADMIN_ID
 
 
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-
+async def start(update:Update,context:ContextTypes.DEFAULT_TYPE):
     context.user_data.clear()
 
     keyboard=[["English","አማርኛ","Afaan Oromoo"]]
@@ -94,7 +89,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return LANG
 
 
-async def language(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def language(update:Update,context:ContextTypes.DEFAULT_TYPE):
 
     lang=language_map.get(update.message.text)
 
@@ -111,7 +106,7 @@ async def language(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return NAME
 
 
-async def name(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def name(update:Update,context:ContextTypes.DEFAULT_TYPE):
 
     context.user_data["name"]=update.message.text
 
@@ -125,7 +120,7 @@ async def name(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return PHONE
 
 
-async def phone(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def phone(update:Update,context:ContextTypes.DEFAULT_TYPE):
 
     if update.message.contact:
         phone=update.message.contact.phone_number
@@ -144,7 +139,7 @@ async def phone(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return COURSE
 
 
-async def course(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def course(update:Update,context:ContextTypes.DEFAULT_TYPE):
 
     context.user_data["course"]=update.message.text
 
@@ -156,16 +151,14 @@ async def course(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return CLASS
 
 
-async def class_type(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def class_type(update:Update,context:ContextTypes.DEFAULT_TYPE):
 
     choice=update.message.text
     context.user_data["class"]=choice
 
     if choice=="Online":
-
         context.user_data["time"]="Online"
         context.user_data["location"]="Online"
-
         return await finish(update,context)
 
     await update.message.reply_text(
@@ -176,7 +169,7 @@ async def class_type(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return TIME
 
 
-async def time(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def time(update:Update,context:ContextTypes.DEFAULT_TYPE):
 
     context.user_data["time"]=update.message.text
 
@@ -188,14 +181,14 @@ async def time(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return LOCATION
 
 
-async def location(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def location(update:Update,context:ContextTypes.DEFAULT_TYPE):
 
     context.user_data["location"]=update.message.text
 
     return await finish(update,context)
 
 
-async def finish(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def finish(update:Update,context:ContextTypes.DEFAULT_TYPE):
 
     data=context.user_data
     user=update.message.from_user
@@ -225,19 +218,19 @@ async def finish(update: Update, context: ContextTypes.DEFAULT_TYPE):
     except:
         pass
 
-    await update.message.reply_text(summary)
+    await update.message.reply_text("✅ Registration completed")
 
     return ConversationHandler.END
 
 
-async def broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def broadcast(update:Update,context:ContextTypes.DEFAULT_TYPE):
 
     if not is_admin(update.effective_user.id):
         await update.message.reply_text("❌ Admin only command")
         return
 
     if not context.args:
-        await update.message.reply_text("Usage:\n/broadcast message")
+        await update.message.reply_text("Usage: /broadcast message")
         return
 
     message=" ".join(context.args)
@@ -251,11 +244,10 @@ async def broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
         except:
             pass
 
-    await update.message.reply_text(f"✅ Broadcast sent to {sent} users")
+    await update.message.reply_text(f"Broadcast sent to {sent} users")
 
 
-async def myid(update: Update, context: ContextTypes.DEFAULT_TYPE):
-
+async def myid(update:Update,context:ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(str(update.effective_user.id))
 
 
@@ -268,7 +260,6 @@ def main():
     entry_points=[CommandHandler("start",start)],
 
     states={
-
     LANG:[MessageHandler(filters.TEXT & ~filters.COMMAND,language)],
     NAME:[MessageHandler(filters.TEXT & ~filters.COMMAND,name)],
     PHONE:[MessageHandler(filters.CONTACT | filters.TEXT,phone)],
@@ -276,11 +267,9 @@ def main():
     CLASS:[MessageHandler(filters.TEXT & ~filters.COMMAND,class_type)],
     TIME:[MessageHandler(filters.TEXT & ~filters.COMMAND,time)],
     LOCATION:[MessageHandler(filters.TEXT & ~filters.COMMAND,location)]
-
     },
 
     fallbacks=[CommandHandler("start",start)]
-
     )
 
     app.add_handler(conv)
